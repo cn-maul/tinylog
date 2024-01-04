@@ -2,100 +2,46 @@ package tlog
 
 import (
 	"fmt"
-	"io"
 	"os"
-	"strings"
 	"time"
 )
 
-const (
-	timeFormat = "2006-01-02_15-04-05"
-)
-
-// 日志的结构体
-type Log struct {
-	Start   string          //记录日志的开始时间,作为文件名
-	Content strings.Builder //日志内容
+// LogLevel 定义日志级别和对应的字符串表示
+var LogLevel = map[int]string{
+	0: "Info",
+	1: "Error",
 }
 
-// 单条日志信息的结构体
+// Logger 结构体表示日志器
 type Logger struct {
-	Level   string //日志等级
-	Content string //日志内容
+	file *os.File
 }
 
-// New 创建一个新的日志对象
-func New() *Log {
-	return &Log{
-		Start:   time.Now().Format(timeFormat),
-		Content: strings.Builder{},
+// NewLogger 创建一个新的Logger实例，并打开指定文件
+func NewLogger() (*Logger, error) {
+	timestamp := time.Now().Format("2006-01-02 15-04-05")
+	file, err := os.Create(timestamp + ".log")
+	if err != nil {
+		return nil, err
 	}
+	return &Logger{file: file}, nil
 }
 
-// Write 将日志写入本地文件
-func (l *Log) Write(path string) {
-	// 检查路径是否存在
-	_, err := os.Stat(path)
-	if err != nil {
-		if os.IsNotExist(err) {
-			fmt.Println(err)
-		}
-		return
-	}
-
-	// 创建一个文件
-	filename := l.Start + ".log"
-	f, err := os.Create(filename)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	// 将数据写入文件
-	_, err = io.WriteString(f, l.Content.String())
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+// Close 方法用于关闭日志文件
+func (l *Logger) Close() {
+	l.file.Close()
 }
 
-// Add 将一条日志信息添加到日志对象中
-func (l *Log) Add(g *Logger) error {
-	log := "[" + g.Level + "]" + time.Now().Format(timeFormat) + ":" + g.Content + "\n"
-	l.Content.Grow(len(log))
-	_, err := l.Content.WriteString(log)
-	return err
+func (l *Logger) Info(format string, a ...any) {
+	timestamp := time.Now().Format("2006-01-02 15:04:05")
+	logMessage := timestamp + " " + LogLevel[0] + " " + fmt.Sprintf(format, a) + "\n"
+	fmt.Println(logMessage)
+	l.file.WriteString(logMessage)
 }
 
-// Info 记录一条信息日志
-func (l *Log) Info(content string) {
-	err := l.Add(&Logger{
-		Level:   "Info ",
-		Content: content,
-	})
-	if err != nil {
-		fmt.Println("Error Writing Builder")
-	}
-}
-
-// Error 记录一条错误日志
-func (l *Log) Error(content string) {
-	err := l.Add(&Logger{
-		Level:   "Error",
-		Content: content,
-	})
-	if err != nil {
-		fmt.Println("Error Writing Builder")
-	}
-}
-
-// Fatal 记录一条致命日志
-func (l *Log) Fatal(content string) {
-	err := l.Add(&Logger{
-		Level:   "Fatal",
-		Content: content,
-	})
-	if err != nil {
-		fmt.Println("Error Writing Builder")
-	}
+func (l *Logger) Error(err string) {
+	timestamp := time.Now().Format("2006-01-02 15:04:05")
+	logMessage := fmt.Sprintln(timestamp, LogLevel[1], "["+err+"]")
+	fmt.Print(logMessage)
+	l.file.WriteString(logMessage)
 }
