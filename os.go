@@ -7,8 +7,6 @@ import (
 )
 
 func (l *Logger) Write() {
-	//检查日志输出文件夹是否存在
-	checkOutput()
 	// 创建一个带有缓冲区的写入器
 	writer := bufio.NewWriter(l.Output)
 

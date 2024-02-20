@@ -9,6 +9,7 @@ import (
 )
 
 var DefaultPrefix = time.Now().Format("2006/01/02 15:04:05")
+var OutputPrefix = time.Now().Format("2006-01-02 15-04-05")
 
 type Logger struct {
 	Output *os.File
@@ -27,7 +28,8 @@ var DefaultLogger = Logger{
 }
 
 func New() *Logger {
-	output, err := os.Open("./log/" + DefaultPrefix + ".log")
+	checkOutput()
+	output, err := os.Create("./log/" + OutputPrefix + ".log")
 	if err != nil {
 		log.Println(err)
 	}
