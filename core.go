@@ -56,6 +56,7 @@ func (l *Logger) Println(logLevel, msg string) {
 
 	if l.BufNum == 10 {
 		//写入文件的函数
+		l.Write()
 		l.reset()
 	}
 
