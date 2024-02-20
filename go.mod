@@ -1,3 +1,3 @@
-module github.com/cn-maul/tlog
+module tinylog
 
-go 1.21
+go 1.22
