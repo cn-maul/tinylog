@@ -1,8 +1,18 @@
-# Tinylog
+# tlog
 
-## 安装
+## 使用
 
 ```bash
-go get github.com/cn-maul/tinylog
+package main
+
+import "github.com/cn-maul/tlog"
+
+func main{
+  tlog.Suffix = ".log" // or .json
+  
+  tlog.Println("errror")
+  tlog.Errorln("infoinfo")
+}
 ```
+
 
