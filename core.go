@@ -28,7 +28,7 @@ func init() {
 // fatalWrite 捕获SIGINT和SIGTERM信号，写入日志并退出程序
 func fatalWrite() {
 	c := make(chan os.Signal, 1)
-	signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
+	signal.Notify(c, syscall.SIGINT, syscall.SIGTERM,syscall.SIGQUIT)
 	go func() {
 		for range c {
 			write()    // 写入日志
